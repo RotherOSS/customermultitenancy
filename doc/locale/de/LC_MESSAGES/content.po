@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: OTOBO Installation Guide rel-10.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-16 09:19+0200\n"
-"PO-Revision-Date: 2024-07-22 08:13+0000\n"
+"PO-Revision-Date: 2025-01-10 11:21+0000\n"
 "Last-Translator: Markus Hlinka <mah@rother-oss.com>\n"
 "Language-Team: German <http://weblate.otobo.org/projects/"
 "manual-customermultitenancy/rel-10_1/de/>\n"
@@ -18,12 +18,12 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4.2\n"
+"X-Generator: Weblate 5.8.4\n"
 "Generated-By: Babel 2.4.0\n"
 
 #: ../../content/index.rst:16
 msgid "Sacrifice to Sphinx"
-msgstr ""
+msgstr "Sacrifice to Sphinx"
 
 #: ../../content/index.rst:19
 msgid "Description"
@@ -57,7 +57,7 @@ msgstr ""
 
 #: ../../content/index.rst:30
 msgid "Framework"
-msgstr ""
+msgstr "Framework"
 
 #: ../../content/index.rst:31
 msgid "OTOBO 10.0.x"
@@ -167,11 +167,11 @@ msgstr ""
 
 #: ../../content/index.rst:141
 msgid "About"
-msgstr ""
+msgstr "Über"
 
 #: ../../content/index.rst:144
 msgid "Contact"
-msgstr ""
+msgstr "Kontakt"
 
 #: ../../content/index.rst:145
 msgid "Rother OSS GmbH"
@@ -183,7 +183,7 @@ msgstr ""
 
 #: ../../content/index.rst:147
 msgid "Web: https://otobo.de"
-msgstr ""
+msgstr "Web: https://otobo.de"
 
 #: ../../content/index.rst:150
 msgid "Version"
