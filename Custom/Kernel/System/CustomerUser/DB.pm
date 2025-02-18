@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - e44c18aea9abc125fddf9ceeed204db4fab290e0 - Kernel/System/CustomerUser/DB.pm
+# $origin: otobo - c4ec80d6e4c0746e5355689b5e55caece84a5e9b - Kernel/System/CustomerUser/DB.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -25,7 +25,7 @@ use warnings;
 use Digest::SHA ();
 
 # CPAN modules
-use Crypt::PasswdMD5 qw(apache_md5_crypt unix_md5_crypt );
+use Crypt::PasswdMD5 qw(apache_md5_crypt unix_md5_crypt);
 
 # OTOBO modules
 use Kernel::System::VariableCheck qw(:all);
@@ -55,8 +55,7 @@ sub new {
     my ( $Type, %Param ) = @_;
 
     # allocate new hash for object
-    my $Self = {};
-    bless( $Self, $Type );
+    my $Self = bless {}, $Type;
 
     # check needed data
     for my $Needed (qw( PreferencesObject CustomerUserMap )) {
@@ -1771,8 +1770,7 @@ sub CustomerUserUpdate {
 sub SetPassword {
     my ( $Self, %Param ) = @_;
 
-    my $Login = $Param{UserLogin};
-    my $Pw    = $Param{PW} || '';
+    # This method is similar to Kernel::System::User::SetPassword()
 
     # check ro/rw
     if ( $Self->{ReadOnly} ) {
@@ -1780,24 +1778,32 @@ sub SetPassword {
             Priority => 'error',
             Message  => 'Customer backend is read only!',
         );
+
         return;
     }
 
+    my $Login = $Param{UserLogin};
+    my $Pw    = $Param{PW} || '';
+
     # check needed stuff
-    if ( !$Param{UserLogin} ) {
+    if ( !$Login ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => 'Need UserLogin!',
         );
+
         return;
     }
+
+    # TODO: add check whether the CustomerUser exists
+
     my $CryptedPw = '';
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigSection = 'Customer::AuthModule::DB';
 
-    my $CryptType = $ConfigObject->Get('Customer::AuthModule::DB::CryptType') || 'sha2';
+    my $CryptType = $ConfigObject->Get("${ConfigSection}::CryptType") || 'sha2';
 
-    # get encode object
     my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
 
     # crypt plain (no crypt at all)
@@ -1805,7 +1811,7 @@ sub SetPassword {
         $CryptedPw = $Pw;
     }
 
-    # crypt with unix crypt
+    # crypt with UNIX crypt
     elsif ( $CryptType eq 'crypt' ) {
 
         # encode output, needed by crypt() only non utf8 signs
@@ -1816,7 +1822,7 @@ sub SetPassword {
         $EncodeObject->EncodeInput( \$CryptedPw );
     }
 
-    # crypt with md5 crypt
+    # crypt with unix_md5_crypt
     elsif ( $CryptType eq 'md5' || !$CryptType ) {
 
         # encode output, needed by unix_md5_crypt() only non utf8 signs
@@ -1827,7 +1833,7 @@ sub SetPassword {
         $EncodeObject->EncodeInput( \$CryptedPw );
     }
 
-    # crypt with md5 crypt (compatible with Apache's .htpasswd files)
+    # crypt with md5 (compatible with Apache's .htpasswd files)
     elsif ( $CryptType eq 'apr1' ) {
 
         # encode output, needed by apache_md5_crypt() only non utf8 signs
@@ -1847,6 +1853,7 @@ sub SetPassword {
         $CryptedPw = $SHAObject->hexdigest();
     }
 
+    # crypt with sha512
     elsif ( $CryptType eq 'sha512' ) {
 
         my $SHAObject = Digest::SHA->new('sha512');
@@ -1858,19 +1865,17 @@ sub SetPassword {
     # bcrypt
     elsif ( $CryptType eq 'bcrypt' ) {
 
-        # get main object
         my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
 
         if ( !$MainObject->Require('Crypt::Eksblowfish::Bcrypt') ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  =>
-                    "CustomerUser: '$Login' tried to store password with bcrypt but 'Crypt::Eksblowfish::Bcrypt' is not installed!",
+                Message  => "CustomerUser: '$Login' tried to store password with bcrypt but 'Crypt::Eksblowfish::Bcrypt' is not installed!",
             );
             return;
         }
 
-        my $Cost = $ConfigObject->Get('Customer::AuthModule::DB::bcryptCost') // 12;
+        my $Cost = $ConfigObject->Get("${ConfigSection}::bcryptCost") // 12;
 
         # Don't allow values smaller than 9 for security.
         $Cost = 9 if $Cost < 9;
@@ -1898,7 +1903,7 @@ sub SetPassword {
         $CryptedPw = "BCRYPT:$Cost:$Salt:" . Crypt::Eksblowfish::Bcrypt::en_base64($Octets);
     }
 
-    # crypt with sha2 as fallback
+    # crypt with sha256 as fallback
     else {
 
         my $SHAObject = Digest::SHA->new('sha256');
