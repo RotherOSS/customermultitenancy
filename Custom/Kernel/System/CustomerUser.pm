@@ -2,9 +2,9 @@
 # OTOBO is a web-based ticketing system for service organisations.
 # --
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2022 Rother OSS GmbH, https://otobo.de/
+# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 57277068291f8177b7cb09e0b100f25a793a915f - Kernel/System/CustomerUser.pm
+# $origin: otobo - c14ca55a8b1d3d686e803c1398813b83d22091e5 - Kernel/System/CustomerUser.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -21,9 +21,9 @@ package Kernel::System::CustomerUser;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
-
 use parent qw(Kernel::System::EventHandler);
+
+use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -226,7 +226,7 @@ sub CustomerSearch {
         $Param{Search} =~ s/\s+$//;
     }
 
-    # Get dynamic fiekd object.
+    # Get dynamic field object.
     my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
 
     my $DynamicFieldConfigs = $DynamicFieldObject->DynamicFieldListGet(
@@ -277,7 +277,6 @@ sub CustomerSearch {
                 # search dynamic field values
                 if ( IsArrayRefWithData($SearchFields) ) {
                     my @SearchDynamicFieldNames = grep { exists $DynamicFieldNames{$_} } @{$SearchFields};
-                    my @SearchDynamicFieldIDs;
 
                     my %FoundDynamicFieldObjectIDs;
                     FIELDNAME:

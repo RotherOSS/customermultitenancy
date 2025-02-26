@@ -2,9 +2,9 @@
 # OTOBO is a web-based ticketing system for service organisations.
 # --
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2022 Rother OSS GmbH, https://otobo.de/
+# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 5e256046cf5064b5b57a5b05d32f47999798ae19 - Kernel/Modules/AdminCustomerUser.pm
+# $origin: otobo - c14ca55a8b1d3d686e803c1398813b83d22091e5 - Kernel/Modules/AdminCustomerUser.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -395,7 +395,7 @@ sub Run {
                 );
             }
 
-            if ( $CurrentUserData{UserPassword} ne $GetParam{UserPassword} ) {
+            if ( $GetParam{UserPassword} && ( $CurrentUserData{UserPassword} // '' ) ne $GetParam{UserPassword} ) {
 
                 $UpdateSuccess = $CustomerUserObject->DeleteOnePreference(
                     Key    => 'UserLastPwChangeTime',
@@ -1285,6 +1285,13 @@ sub _Edit {
             if ($UseAutoComplete) {
 
                 my $Value = $Param{ $Entry->[0] } || $Param{CustomerID};
+                $Value = $LayoutObject->Output(
+                    Template => "[% Data.Value | html %]",
+                    Data     => {
+                        Value => $Value,
+                    }
+                );
+
                 $Param{Option} = '<input type="text" id="UserCustomerID" name="UserCustomerID" value="' . $Value . '"
                     class="W50pc CustomerAutoCompleteSimple '
                     . $Param{RequiredClass} . ' '

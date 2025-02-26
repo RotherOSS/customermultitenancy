@@ -2,9 +2,9 @@
 # OTOBO is a web-based ticketing system for service organisations.
 # --
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2022 Rother OSS GmbH, https://otobo.de/
+# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 5e256046cf5064b5b57a5b05d32f47999798ae19 - Kernel/Modules/AdminCustomerCompany.pm
+# $origin: otobo - c14ca55a8b1d3d686e803c1398813b83d22091e5 - Kernel/Modules/AdminCustomerCompany.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -299,7 +299,7 @@ sub Run {
                     my $CustomerID = $ParamObject->GetParam( Param => 'CustomerID' ) || '';
                     return $LayoutObject->Redirect(
                         OP =>
-                            "Action=$Self->{Action};Subaction=Change;CustomerID=$CustomerID;Nav=$Nav;Notification=Update"
+                            "Action=$Self->{Action};Subaction=Change;CustomerID=" . $LayoutObject->LinkEncode($CustomerID) . ";Nav=$Nav;Notification=Update"
                     );
                 }
                 else {
