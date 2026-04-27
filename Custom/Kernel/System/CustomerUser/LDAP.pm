@@ -2,9 +2,9 @@
 # OTOBO is a web-based ticketing system for service organisations.
 # --
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - e44c18aea9abc125fddf9ceeed204db4fab290e0 - Kernel/System/CustomerUser/LDAP.pm
+# $origin: otobo - 6efdc7bf2a3325277cd79a60f0f2407f8ad59e87 - Kernel/System/CustomerUser/LDAP.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -183,10 +183,7 @@ sub new {
     my @DynamicFieldMapEntries = grep { $_->[5] eq 'dynamic_field' } @{ $Self->{CustomerUserMap}->{Map} };
     $Self->{ConfiguredDynamicFieldNames} = { map { $_->[2] => 1 } @DynamicFieldMapEntries };
 
-
-# ---
-# RotherOSS:
-# ---
+# Rother OSS / CustomerMultitenancy
     my $LayoutParam = $Kernel::OM->{Param}->{'Kernel::Output::HTML::Layout'};
 
     # Check if multitenancy is enabled and the request is coming from a user.
@@ -211,7 +208,7 @@ sub new {
             }
         }
     }
-# ---
+# EO CustomerMultitenancy
 
     return $Self;
 }
@@ -524,13 +521,12 @@ sub CustomerSearch {
 
     # check cache
     my $CacheKey = join '::', map { $_ . '=' . $Param{$_} } sort keys %Param;
-# ---
-# RotherOSS: Use cache for multitenancy.
-# ---
+# Rother OSS / CustomerMultitenancy
+    # Use cache for multitenancy.
     if ( $Self->{Multitenancy} ) {
         $CacheKey .= join '', map { '::GroupID=' . $_ } @{ $Self->{UserGroupIDs} };
     }
-# ---
+# EO CustomerMultitenancy
     if ( $Self->{CacheObject} ) {
         my $Users = $Self->{CacheObject}->Get(
             Type => $Self->{CacheType} . '_CustomerSearch',
@@ -551,9 +547,8 @@ sub CustomerSearch {
     # combine needed attrs
     my @Attributes = ( @CustomerUserListFieldsWithoutDynamicFields, $Self->{CustomerKey} );
 
-# ---
-# RotherOSS: Don't search for customer users without group permission.
-# ---
+# Rother OSS / CustomerMultitenancy
+    # Don't search for customer users without group permission.
     if ( $Self->{Multitenancy} ) {
         my $GroupIDAttr;
         for my $Map ( @{ $Self->{CustomerUserMap}->{Map} } ) {
@@ -592,7 +587,7 @@ sub CustomerSearch {
             $Filter .= $AdditionalFilter;
         }
     }
-# ---
+# EO CustomerMultitenancy
 
     # perform user search
     my $Result = $Self->{LDAP}->search(

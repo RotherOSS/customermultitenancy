@@ -2,9 +2,9 @@
 # OTOBO is a web-based ticketing system for service organisations.
 # --
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - e44c18aea9abc125fddf9ceeed204db4fab290e0 - Kernel/System/CustomerCompany.pm
+# $origin: otobo - 6efdc7bf2a3325277cd79a60f0f2407f8ad59e87 - Kernel/System/CustomerCompany.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -67,9 +67,7 @@ sub new {
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
     my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
 
-# ---
-# RotherOSS:
-# ---
+# Rother OSS / CustomerMultitenancy
     my $LayoutParam = $Kernel::OM->{Param}->{'Kernel::Output::HTML::Layout'};
 
     # Check if multitenancy is enabled and the request is coming from a user.
@@ -94,16 +92,15 @@ sub new {
             }
         }
     }
-# ---
+# EO CustomerMultitenancy
 
     # load customer company backend modules
     SOURCE:
     for my $Count ( '', 1 .. 10 ) {
 
         next SOURCE if !$ConfigObject->Get("CustomerCompany$Count");
-# ---
-# RotherOSS: Check if the user has permission to access the source.
-# ---
+# Rother OSS / CustomerMultitenancy
+        # Check if the user has permission to access the source.
         my $CustomerCompanyUserGroup = $ConfigObject->Get("CustomerCompany$Count")->{CustomerCompanyUserGroup};
 
         # The user does not have permission to get information from this source.
@@ -112,7 +109,7 @@ sub new {
                 next SOURCE;
             }
         }
-# ---
+# EO CustomerMultitenancy
 
         my $GenericModule = $ConfigObject->Get("CustomerCompany$Count")->{Module}
             || 'Kernel::System::CustomerCompany::DB';
@@ -270,9 +267,8 @@ sub CustomerCompanyGet {
             }
         }
 
-# ---
-# RotherOSS: Check permission.
-# ---
+# Rother OSS / CustomerMultitenancy
+        # Check permission.
         my $UserGroupIDSync = $Self->{"CustomerCompany$Count"}->{CustomerCompanyMap}->{UserGroupIDSync};
 
         if ( $Company{UserGroupID} && $UserGroupIDSync->{RemoteGroupToLocalGroup} ) {
@@ -300,7 +296,7 @@ sub CustomerCompanyGet {
                 return;
             }
         }
-# ---
+# EO CustomerMultitenancy
 
         # return data for the first found company
         return (
@@ -359,9 +355,8 @@ sub CustomerCompanyUpdate {
         return;
     }
 
-# ---
-# RotherOSS: Check if the user has permission to change the UserGroupID.
-# ---
+# Rother OSS / CustomerMultitenancy
+    # Check if the user has permission to change the UserGroupID.
     if ( $Self->{Multitenancy} ) {
         # Set the UserGroupID to the current UserGroupID.
         if ( $Company{UserGroupID} ) {
@@ -385,7 +380,7 @@ sub CustomerCompanyUpdate {
             }
         }
     }
-# ---
+# EO CustomerMultitenancy
 
     my $Result = $Self->{ $Company{Source} }->CustomerCompanyUpdate(%Param);
 
@@ -574,10 +569,9 @@ sub CustomerCompanyList {
         %Data = ( %Data, %SubData );
     }
 
-# ---
-# RotherOSS: Check if the user has permission to see the customer user data.
-# Improve: Check every company one by one as CustomerCompanyList does sometimes return a non filtered list (CustomerCompany add)
-# ---
+# Rother OSS / CustomerMultitenancy
+    # Check if the user has permission to see the customer user data.
+    # Improve: Check every company one by one as CustomerCompanyList does sometimes return a non filtered list (CustomerCompany add)
     if ( $Self->{Multitenancy} ) {
         for my $CustomerID ( keys %Data ) {
             my %Company = $Self->CustomerCompanyGet(
@@ -589,7 +583,7 @@ sub CustomerCompanyList {
             }
         }
     }
-# ---
+# EO CustomerMultitenancy
 
     return %Data;
 }

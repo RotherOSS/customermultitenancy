@@ -2,9 +2,9 @@
 # OTOBO is a web-based ticketing system for service organisations.
 # --
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - e44c18aea9abc125fddf9ceeed204db4fab290e0 - Kernel/Modules/AdminCustomerUser.pm
+# $origin: otobo - 6efdc7bf2a3325277cd79a60f0f2407f8ad59e87 - Kernel/Modules/AdminCustomerUser.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -124,9 +124,7 @@ sub Run {
     my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
     my $MainObject         = $Kernel::OM->Get('Kernel::System::Main');
 
-# ---
-# RotherOSS:
-# ---
+# Rother OSS / CustomerMultitenancy
     # Check if the user has permission to set multitenancy.
     if ( $ConfigObject->Get('Multitenancy') ) {
         my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
@@ -144,7 +142,7 @@ sub Run {
             $Self->{MultitenancyPermission} = 1;
         }
     }
-# ---
+# EO CustomerMultitenancy
 
     # ------------------------------------------------------------ #
     #  switch to customer
@@ -479,7 +477,10 @@ sub Run {
                         UserObject => $CustomerUserObject,
                         Debug      => $Self->{Debug},
                     );
-                    my @Params = $Object->Param( UserData => \%UserData );
+                    my @Params = $Object->Param(
+                        UserData => \%UserData,
+                        Customer => 1,
+                    );
                     if (@Params) {
                         my %GetParam;
                         for my $ParamItem (@Params) {
@@ -732,7 +733,11 @@ sub Run {
                         UserObject => $CustomerUserObject,
                         Debug      => $Self->{Debug},
                     );
-                    my @Params = $Object->Param( %{ $Preferences{$Group} }, UserData => \%UserData );
+                    my @Params = $Object->Param(
+                        %{ $Preferences{$Group} },
+                        UserData => \%UserData,
+                        Customer => 1,
+                    );
                     if (@Params) {
                         my %GetParam;
                         for my $ParamItem (@Params) {
@@ -1275,7 +1280,7 @@ sub _Edit {
                 Language => $LayoutObject->{UserLanguage},
             );
 
-            # Make sure that the previous value exists in the selection list even if isn't a countr code.
+            # Make sure that the previous value exists in the selection list even if isn't a country code.
             my $PreviousCountry = $Param{ $Entry->[0] };
             if ($PreviousCountry) {
                 $CountryList->{$PreviousCountry} //= $PreviousCountry;
@@ -1366,9 +1371,8 @@ sub _Edit {
             # Use CustomerID param if called from CIC.
             $Param{Value} = $Param{ $Entry->[0] } || $Param{CustomerID} || '';
         }
-# ---
-# RotherOSS: Build the group field.
-# ---
+# Rother OSS / CustomerMultitenancy
+        # Build the group field.
         elsif ( $Entry->[0] =~ /^UserGroupID$/i ) {
             # Check if the user has the permission to see/change the multitenancy field.
             if ( !$Self->{MultitenancyPermission} ) {
@@ -1390,7 +1394,7 @@ sub _Edit {
                 );
             }
         }
-# ---
+# EO CustomerMultitenancy
         else {
             $Param{Value} = $Param{ $Entry->[0] } || '';
         }
@@ -1512,7 +1516,10 @@ sub _Edit {
                     UserObject => $Kernel::OM->Get('Kernel::System::CustomerUser'),
                     Debug      => $Self->{Debug},
                 );
-                my @Params = $Object->Param( UserData => \%Param );
+                my @Params = $Object->Param(
+                    UserData => \%Param,
+                    Customer => 1,
+                );
                 if (@Params) {
                     for my $ParamItem (@Params) {
                         $LayoutObject->Block(
