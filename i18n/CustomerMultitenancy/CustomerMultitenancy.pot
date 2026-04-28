@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: CustomerMultitenancy\n"
-"POT-Creation-Date: 2024-11-13 16:18+0000\n"
+"POT-Creation-Date: 2026-04-28 11:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -9,10 +9,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#. Template: AdminCustomerCompany
-msgid "Limits the access of customer data to certain groups (multitenancy). Without selection, customer data is visible to all agents."
-msgstr ""
 
 #. SysConfig
 msgid "Enables the multitenancy function for customer and customer user."
