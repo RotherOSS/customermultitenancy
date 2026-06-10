@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 6efdc7bf2a3325277cd79a60f0f2407f8ad59e87 - Kernel/Modules/AdminCustomerUser.pm
+# $origin: otobo - deb99d60daf212ae73ec7feb78074f3f7ae563f8 - Kernel/Modules/AdminCustomerUser.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -129,11 +129,11 @@ sub Run {
     if ( $ConfigObject->Get('Multitenancy') ) {
         my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
 
-        my $MultitenancyGroupID = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup(
+        my $MultitenancyGroupID = $GroupObject->GroupLookup(
             Group => $ConfigObject->Get('Multitenancy::PermissionGroup'),
         );
 
-        my %Groups = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
+        my %Groups = $GroupObject->PermissionUserGet(
             UserID => $Self->{UserID},
             Type   => 'rw',
         );
@@ -175,17 +175,19 @@ sub Run {
         # get customer interface session name
         my $SessionName = $ConfigObject->Get('CustomerPanelSessionName') || 'CSID';
 
-        # create a new LayoutObject with SessionIDCookie
-        my $Expires = '+' . $ConfigObject->Get('SessionMaxTime') . 's';
-        if ( !$ConfigObject->Get('SessionUseCookieAfterBrowserClose') ) {
-            $Expires = '';
-        }
-
+        # create a new LayoutObject
         my $LayoutObject = Kernel::Output::HTML::Layout->new(
             %{$Self},
             SessionID   => $NewSessionID,
             SessionName => $ConfigObject->Get('SessionName'),
         );
+
+        # set the session cookie
+        my $Expires = $ConfigObject->Get('SessionUseCookieAfterBrowserClose')
+            ?
+            '+' . $ConfigObject->Get('SessionMaxTime') . 's'
+            :
+            '';
         $LayoutObject->SetCookie(
             Key     => 'SessionIDCookie',
             Name    => $SessionName,
@@ -200,21 +202,16 @@ sub Run {
                 "Switched from Agent to Customer ($Self->{UserLogin} -=> $UserData{UserLogin})",
         );
 
-        # build URL to customer interface
-        my $URL = $ConfigObject->Get('HttpType')
-            . '://'
-            . $ConfigObject->Get('FQDN')
-            . '/'
-            . $ConfigObject->Get('ScriptAlias')
-            . 'customer.pl';
+        # redirect to customer interface
+        my $ExtURL = join '',
+            $ConfigObject->Get('HttpType'),
+            '://',
+            $ConfigObject->Get('FQDN'),
+            '/',
+            $ConfigObject->Get('ScriptAlias'),
+            'customer.pl';
 
-        # if no sessions are used we attach the session as URL parameter
-        if ( !$ConfigObject->Get('SessionUseCookie') ) {
-            $URL .= "?$SessionName=$NewSessionID";
-        }
-
-        # redirect to customer interface with new session id
-        return $LayoutObject->Redirect( ExtURL => $URL );
+        return $LayoutObject->Redirect( ExtURL => $ExtURL );
     }
 
     # search user list
