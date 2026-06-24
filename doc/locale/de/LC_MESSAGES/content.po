@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: OTOBO Installation Guide rel-11.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-27 12:03+0000\n"
-"PO-Revision-Date: 2026-06-23 13:22+0000\n"
+"PO-Revision-Date: 2026-06-24 13:00+0000\n"
 "Last-Translator: Stefan Abel <sta@rother-oss.com>\n"
 "Language-Team: German <http://translate.otobo.org/projects/otobo-11-1/addons/"
 "manuals/customermultitenancy-documentation/de/>\n"
@@ -39,6 +39,12 @@ msgid ""
 "group. Those customers are then visible only for agents with access rights "
 "to the specific group. Also complete customer sources can be restricted."
 msgstr ""
+"Dieses Paket ermöglicht gruppenbasierte Einschränkungen für Kunden- und "
+"Kundenbenutzer-Informationen für Agenten. Standardmäßig sind für alle "
+"Agenten alle Kunden sichtbar. Nach der Installation dieses Pakets können "
+"Kunden einer Agentengruppe zugewiesen werden. Diese Kunden sind dann nur für "
+"jene Agenten sichtbar, die Zugriffsrechte auf die jeweilige Gruppe haben. "
+"Auch komplette Kundenquellen können eingeschränkt werden."
 
 #: ../content/index.rst:13
 msgid ""
@@ -154,6 +160,7 @@ msgstr ""
 #: ../content/index.rst:125
 msgid "Enables the multitenancy function for customer and customer user."
 msgstr ""
+"Aktiviert die Funktion der Mandantenfähigkeit für Kunden und Kundenbenutzer."
 
 #: ../content/index.rst:128
 msgid "Multitenancy::PermissionGroup"
@@ -164,6 +171,8 @@ msgid ""
 "Specifies the group that can set multitenancy for customer. Multitenancy "
 "does not apply to members of this group."
 msgstr ""
+"Definiert die Gruppe, welche die Mandantenfähigkeit für Kunden festlegen "
+"kann. Die Mandantenfähigkeit gilt nicht für Mitglieder dieser Gruppe."
 
 #: ../content/index.rst:132
 msgid "About"
