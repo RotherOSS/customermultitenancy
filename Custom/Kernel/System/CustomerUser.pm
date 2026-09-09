@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - deb99d60daf212ae73ec7feb78074f3f7ae563f8 - Kernel/System/CustomerUser.pm
+# $origin: otobo - a2a5e23691d1a00610f14606edb00523361f913d - Kernel/System/CustomerUser.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -193,9 +193,9 @@ sub CustomerSourceList {
 
 =head2 CustomerSearch()
 
-to search customer users
+to search customer users.
 
-    # text search
+    # text search in the customer search fields
     my %List = $CustomerUserObject->CustomerSearch(
         Search => '*some*', # also 'hans+huber' possible
         Valid  => 1,        # (optional) default 1
@@ -215,8 +215,18 @@ to search customer users
     );
 
     # search by CustomerID
+    # It depends on the data backend when an '*' is considered a wildcard.
+    # The DB backend considers '*' as an wildcard.
+    # The LDAP backend does not do so.
     my %List = $CustomerUserObject->CustomerSearch(
         CustomerID       => 'CustomerID123',
+        Valid            => 1,                # (optional) default 1
+    );
+
+    # Search by CustomerID without wildcard expansion.
+    # So searching by 'Alois*' would find only 'Alois*' and not 'Alois' or 'Aloisia'.
+    my %List = $CustomerUserObject->CustomerSearch(
+        CustomerIDRaw    => 'CustomerID123',
         Valid            => 1,                # (optional) default 1
     );
 
@@ -226,6 +236,8 @@ Returns a hash like:
         'tina' => '"Tina Tester" <tina@example.com>',
         'toni' => '"Toni Tester" <toni@example.com>',
     }
+
+The method is misnamed as C<CustomerSearch> searches for customer users, not customers aka customer companies.
 
 =cut
 
@@ -1207,6 +1219,7 @@ sub CustomerUserUpdate {
             Priority => 'error',
             Message  => "No such user '$UserLogin'!",
         );
+
         return;
     }
 
@@ -1240,13 +1253,14 @@ sub CustomerUserUpdate {
 # EO CustomerMultitenancy
 
     my $Result = $Self->{ $User{Source} }->CustomerUserUpdate(%Param);
-    return if !$Result;
+
+    return unless $Result;
 
     # trigger event
     $Self->EventHandler(
         Event => 'CustomerUserUpdate',
         Data  => {
-            UserLogin => $Param{ID} || $Param{UserLogin},
+            UserLogin => $UserLogin,
             NewData   => \%Param,
             OldData   => \%User,
         },

@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 6efdc7bf2a3325277cd79a60f0f2407f8ad59e87 - Kernel/System/CustomerUser/LDAP.pm
+# $origin: otobo - aeb3ebd75e18f2836bd7c82ebeacfa4b2330fbd9 - Kernel/System/CustomerUser/LDAP.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -18,12 +18,19 @@
 
 package Kernel::System::CustomerUser::LDAP;
 
+use v5.26;
 use strict;
 use warnings;
+use namespace::autoclean;
+use utf8;
 
+# core modules
+
+# CPAN modules
 use Net::LDAP;
 use Net::LDAP::Util qw(escape_filter_value);
 
+# OTOBO modules
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -33,6 +40,7 @@ our @ObjectDependencies = (
     'Kernel::System::DB',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
+    'Kernel::System::EmailAddress',
     'Kernel::System::Encode',
 # Rother OSS / CustomerMultitenancy
     'Kernel::System::Group',
@@ -44,9 +52,7 @@ our @ObjectDependencies = (
 sub new {
     my ( $Type, %Param ) = @_;
 
-    # allocate new hash for object
-    my $Self = {};
-    bless( $Self, $Type );
+    my $Self = bless {}, $Type;
 
     # check needed data
     for my $Needed (qw( PreferencesObject CustomerUserMap )) {
@@ -57,10 +63,7 @@ sub new {
     $Self->{UserSearchListLimit} = $Self->{CustomerUserMap}->{CustomerUserSearchListLimit} || 200;
 
     # get ldap preferences
-    $Self->{Die} = 0;
-    if ( defined $Self->{CustomerUserMap}->{Params}->{Die} ) {
-        $Self->{Die} = $Self->{CustomerUserMap}->{Params}->{Die};
-    }
+    $Self->{Die} = $Self->{CustomerUserMap}->{Params}->{Die} // 0;
 
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
@@ -151,14 +154,8 @@ sub new {
     $Self->{AlwaysFilter} = $Self->{CustomerUserMap}->{Params}->{AlwaysFilter} || '';
 
     $Self->{ExcludePrimaryCustomerID} = $Self->{CustomerUserMap}->{CustomerUserExcludePrimaryCustomerID} || 0;
-    $Self->{SearchPrefix}             = $Self->{CustomerUserMap}->{CustomerUserSearchPrefix};
-    if ( !defined $Self->{SearchPrefix} ) {
-        $Self->{SearchPrefix} = '';
-    }
-    $Self->{SearchSuffix} = $Self->{CustomerUserMap}->{CustomerUserSearchSuffix};
-    if ( !defined $Self->{SearchSuffix} ) {
-        $Self->{SearchSuffix} = '*';
-    }
+    $Self->{SearchPrefix}             = $Self->{CustomerUserMap}->{CustomerUserSearchPrefix} // '';
+    $Self->{SearchSuffix}             = $Self->{CustomerUserMap}->{CustomerUserSearchSuffix} // '*';
 
     # charset settings
     $Self->{SourceCharset} = $Self->{CustomerUserMap}->{Params}->{SourceCharset} || '';
@@ -220,7 +217,10 @@ sub _Connect {
     return 1 if $Self->{LDAP};
 
     # ldap connect and bind (maybe with SearchUserDN and SearchUserPw)
-    $Self->{LDAP} = Net::LDAP->new( $Self->{Host}, %{ $Self->{Params} } );
+    $Self->{LDAP} = Net::LDAP->new(
+        $Self->{Host},
+        $Self->{Params}->%*
+    );
 
     if ( !$Self->{LDAP} ) {
         if ( $Self->{Die} ) {
@@ -426,12 +426,18 @@ sub CustomerSearch {
     }
 
     # check needed stuff
-    if ( !$Param{Search} && !$Param{UserLogin} && !$Param{PostMasterSearch} && !$Param{CustomerID} )
+    if (
+        !$Param{Search}
+        && !$Param{UserLogin}
+        && !$Param{PostMasterSearch}
+        && !$Param{CustomerID}
+        )
     {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Need Search, UserLogin, PostMasterSearch or CustomerID!'
+            Message  => 'Need Search, UserLogin, PostMasterSearch, CustomerIDRaw or CustomerID!'
         );
+
         return;
     }
 
@@ -506,6 +512,9 @@ sub CustomerSearch {
         $Filter = "($Self->{CustomerKey}=" . escape_filter_value( $Param{UserLogin} ) . ')';
     }
     elsif ( $Param{CustomerID} ) {
+
+        # $Param{CustomerIDRaw} is also handled in the this block
+        # there is no '*' wildcard expansion when searching for CustomerID
         $Filter = "($Self->{CustomerID}=" . escape_filter_value( $Param{CustomerID} ) . ')';
     }
 
@@ -527,6 +536,7 @@ sub CustomerSearch {
         $CacheKey .= join '', map { '::GroupID=' . $_ } @{ $Self->{UserGroupIDs} };
     }
 # EO CustomerMultitenancy
+
     if ( $Self->{CacheObject} ) {
         my $Users = $Self->{CacheObject}->Get(
             Type => $Self->{CacheType} . '_CustomerSearch',
@@ -1463,7 +1473,8 @@ sub CustomerUserDataGet {
     ENTRY:
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
         next ENTRY if $Entry->[5] eq 'dynamic_field';
-        push( @Attributes, $Entry->[2] );
+
+        push @Attributes, $Entry->[2];
     }
     my $Filter = "($Self->{CustomerKey}=" . escape_filter_value( $Param{User} ) . ')';
 
@@ -1543,31 +1554,47 @@ sub CustomerUserDataGet {
 
     return if !$Data{UserLogin};
 
-    # to build the UserMailString
-    my $UserMailString = '';
-    my @UserMailStringParts;
+    # build the UserMailString, e.g q{"Troy Andrews Cold Room \"The Fridge\"    🥶" <unittest@example.org>}
+    {
+        my $Fields = $Self->{CustomerUserMap}->{CustomerUserListFields};
+        if ( !IsArrayRefWithData($Fields) ) {
+            $Fields = [ 'first_name', 'last_name', 'email', ];
+        }
 
-    my $CustomerUserListFieldsMap = $Self->{CustomerUserMap}->{CustomerUserListFields};
-    if ( !IsArrayRefWithData($CustomerUserListFieldsMap) ) {
-        $CustomerUserListFieldsMap = [ 'first_name', 'last_name', 'email', ];
-    }
+        my @Values;
+        FIELD:
+        for my $Field ( $Fields->@* ) {
 
-    for my $Field ( @{$CustomerUserListFieldsMap} ) {
+            # _ConvertFrom() is usually a no-op
+            my $Value = $Self->_ConvertFrom( $Result2->get_value($Field) ) || '';
 
-        my $Value = $Self->_ConvertFrom( $Result2->get_value($Field) ) || '';
+            # it is not obvious why q{0} is not a valid value
+            next FIELD unless $Value;
 
-        if ($Value) {
             if ( $Field =~ /^targetaddress$/i ) {
                 $Value =~ s/SMTP:(.*)/$1/;
             }
-            push @UserMailStringParts, $Value;
+
+            push @Values, $Value;
+        }
+
+        if (@Values) {
+
+            # Format compliant to RFC 5322. This is relevant when the real name
+            # contain commas, double quotes, or other special symbols.
+            #
+            # It is expected that the last part is the address.
+            my $Address = pop @Values;
+            my $Phrase  = join ' ', @Values;
+            $Data{UserMailString} = $Kernel::OM->Get('Kernel::System::EmailAddress')->Format(
+                RealName => $Phrase,
+                Address  => $Address,
+            );
+        }
+        else {
+            $Data{UserMailString} = '';
         }
     }
-    $UserMailString = join ' ', @UserMailStringParts;
-    $UserMailString =~ s/^(.*)\s(.+?\@.+?\..+?)(\s|)$/"$1" <$2>/;
-
-    # add the UserMailString to the data hash
-    $Data{UserMailString} = $UserMailString;
 
     # compat!
     $Data{UserID} = $Data{UserLogin};
@@ -1609,7 +1636,7 @@ sub CustomerUserAdd {
     if ( $Self->{ReadOnly} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Customer backend is read only!'
+            Message  => 'Customer backend is read only!',
         );
         return;
     }
@@ -1719,12 +1746,13 @@ sub SearchPreferences {
 sub _ConvertFrom {
     my ( $Self, $Text ) = @_;
 
-    return if !defined $Text;
+    return unless defined $Text;
 
-    if ( !$Self->{SourceCharset} ) {
-        return $Text;
-    }
+    # _ConvertFrom() does nothing except in special cases where SourceCharset is set.
+    return $Text unless $Self->{SourceCharset};
 
+    # When SourceCharset is 'utf-8' then set the UTF-8 flag
+    # without checkeck whether the taxt actually is valid UTF-8.
     return $Kernel::OM->Get('Kernel::System::Encode')->Convert(
         Text => $Text,
         From => $Self->{SourceCharset},
