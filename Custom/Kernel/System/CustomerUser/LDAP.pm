@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 6efdc7bf2a3325277cd79a60f0f2407f8ad59e87 - Kernel/System/CustomerUser/LDAP.pm
+# $origin: otobo - 1b8118bfd450f9745b97f3dd4ea9794249aaf0a0 - Kernel/System/CustomerUser/LDAP.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -426,12 +426,18 @@ sub CustomerSearch {
     }
 
     # check needed stuff
-    if ( !$Param{Search} && !$Param{UserLogin} && !$Param{PostMasterSearch} && !$Param{CustomerID} )
+    if (
+        !$Param{Search}
+        && !$Param{UserLogin}
+        && !$Param{PostMasterSearch}
+        && !$Param{CustomerID}
+        )
     {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Need Search, UserLogin, PostMasterSearch or CustomerID!'
+            Message  => 'Need Search, UserLogin, PostMasterSearch, CustomerIDRaw or CustomerID!'
         );
+
         return;
     }
 
@@ -506,6 +512,9 @@ sub CustomerSearch {
         $Filter = "($Self->{CustomerKey}=" . escape_filter_value( $Param{UserLogin} ) . ')';
     }
     elsif ( $Param{CustomerID} ) {
+
+        # $Param{CustomerIDRaw} is also handled in the this block
+        # there is no '*' wildcard expansion when searching for CustomerID
         $Filter = "($Self->{CustomerID}=" . escape_filter_value( $Param{CustomerID} ) . ')';
     }
 
@@ -527,6 +536,7 @@ sub CustomerSearch {
         $CacheKey .= join '', map { '::GroupID=' . $_ } @{ $Self->{UserGroupIDs} };
     }
 # EO CustomerMultitenancy
+
     if ( $Self->{CacheObject} ) {
         my $Users = $Self->{CacheObject}->Get(
             Type => $Self->{CacheType} . '_CustomerSearch',

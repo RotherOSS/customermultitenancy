@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 823aa25d26e191c2adf69c1cfde2f4510e24699b - Kernel/System/CustomerUser/DB.pm
+# $origin: otobo - 1b8118bfd450f9745b97f3dd4ea9794249aaf0a0 - Kernel/System/CustomerUser/DB.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -312,6 +312,7 @@ sub CustomerSearch {
             Priority => 'error',
             Message  => 'Need Search, UserLogin, PostMasterSearch, CustomerIDRaw or CustomerID!',
         );
+
         return;
     }
 
@@ -323,6 +324,7 @@ sub CustomerSearch {
         $CacheKey .= join '', map { '::GroupID=' . $_ } @{ $Self->{UserGroupIDs} };
     }
 # EO CustomerMultitenancy
+
     if ( $Self->{CacheObject} ) {
         my $Users = $Self->{CacheObject}->Get(
             Type => $Self->{CacheType} . '_CustomerSearch',
@@ -510,6 +512,7 @@ sub CustomerSearch {
     }
     elsif ( $Param{CustomerIDRaw} ) {
 
+        # there is no '*' wildcard expansion when searching for CustomerIDRaw
         push @Bind, \$Param{CustomerIDRaw};
 
         if ( $Self->{CaseSensitive} ) {
@@ -1819,7 +1822,7 @@ sub SetPassword {
     }
 
     # crypt with unix_md5_crypt
-    elsif ( $CryptType eq 'md5' || !$CryptType ) {
+    elsif ( $CryptType eq 'md5' ) {
 
         # encode output, needed by unix_md5_crypt() only non utf8 signs
         $EncodeObject->EncodeOutput( \$Pw );
