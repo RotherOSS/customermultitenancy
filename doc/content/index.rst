@@ -32,6 +32,15 @@ Third-party software
 --------------------
 \-
 
+Limitations
+===========
+
+The package is intended to restrict agent access within the standard ticketing and customer-user functionality.
+I.e. it prevents agents from finding customer users in the "Customer User" selections in ticket create and similar screens, as well as the customer (user) information centers and AdminCustomer(User) which in standard installations can be used by the users.
+Ticket access is not changed, that is, if an agent has access to a queue containing a ticket of a customer they cannot view, the ticket is still shown, but the customer user information in the ticket will be empty.
+
+The package currently does not cover some advanced functionality, notably it does not affect elastic search results, and it is not intended to restrict dedicated admin functionalities like AdminCustomerUserCustomer.
+
 Setup
 =====
 
