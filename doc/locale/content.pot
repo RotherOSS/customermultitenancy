@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OTOBO Documentation dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-27 12:03+0000\n"
+"POT-Creation-Date: 2026-09-23 12:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,101 +62,113 @@ msgid "Third-party software"
 msgstr ""
 
 #: ../content/index.rst:33
-msgid "Setup"
+msgid "Limitations"
 msgstr ""
 
 #: ../content/index.rst:35
+msgid "The package is intended to restrict agent access within the standard ticketing and customer-user functionality. I.e. it prevents agents from finding customer users in the \"Customer User\" selections in ticket create and similar screens, as well as the customer (user) information centers and AdminCustomer(User) which in standard installations can be used by the users. Ticket access is not changed, that is, if an agent has access to a queue containing a ticket of a customer they cannot view, the ticket is still shown, but the customer user information in the ticket will be empty."
+msgstr ""
+
+#: ../content/index.rst:39
+msgid "The package currently does not cover some advanced functionality, notably it does not affect elastic search results, and it is not intended to restrict dedicated admin functionalities like AdminCustomerUserCustomer."
+msgstr ""
+
+#: ../content/index.rst:42
+msgid "Setup"
+msgstr ""
+
+#: ../content/index.rst:44
 msgid "In the Config.pm a set of adjustments is mandatory. For both DB and LDAP it is necessary to change the CustomerCompany and/or CustomerUser blocks. (If you do not have them present, please copy them for Kernel/Config/Defaults.pm to Kernel/Config.pm and adjust them in the latter!) To enable setting of the agent group in AdminCustomer and AdminCustomerUser the variables have to be added to the maps."
 msgstr ""
 
-#: ../content/index.rst:38
+#: ../content/index.rst:47
 msgid "Backends"
 msgstr ""
 
-#: ../content/index.rst:41
+#: ../content/index.rst:50
 msgid "Database"
 msgstr ""
 
-#: ../content/index.rst:43
+#: ../content/index.rst:52
 msgid "For the DB backend in both the CustomerCompany and CustomerUser definitions this can be added as follows."
 msgstr ""
 
-#: ../content/index.rst:58
+#: ../content/index.rst:67
 msgid "LDAP"
 msgstr ""
 
-#: ../content/index.rst:60
+#: ../content/index.rst:69
 msgid "For the LDAP backend in both the CustomerCompany and CustomerUser definitions this is similar."
 msgstr ""
 
-#: ../content/index.rst:75
+#: ../content/index.rst:84
 msgid "'otoboGroup' here is just exemplary and has to be replaced with the attribute of the directory. Additionally in most cases a mapping between AD and OTOBO groups will be necessary. This is configured by the following."
 msgstr ""
 
-#: ../content/index.rst:97
+#: ../content/index.rst:106
 msgid "Global"
 msgstr ""
 
-#: ../content/index.rst:99
+#: ../content/index.rst:108
 msgid "Independently of the backend, it can also be restricted completely."
 msgstr ""
 
-#: ../content/index.rst:113
+#: ../content/index.rst:122
 msgid "Frontend"
 msgstr ""
 
-#: ../content/index.rst:115
+#: ../content/index.rst:124
 msgid "In the customer and customer user administrations the groups can now be configured or seen for read only backends."
 msgstr ""
 
-#: ../content/index.rst:118
+#: ../content/index.rst:127
 msgid "Configuration Reference"
 msgstr ""
 
-#: ../content/index.rst:121
+#: ../content/index.rst:130
 msgid "Core::Permission"
 msgstr ""
 
-#: ../content/index.rst:124
+#: ../content/index.rst:133
 msgid "Multitenancy"
 msgstr ""
 
-#: ../content/index.rst:125
+#: ../content/index.rst:134
 msgid "Enables the multitenancy function for customer and customer user."
 msgstr ""
 
-#: ../content/index.rst:128
+#: ../content/index.rst:137
 msgid "Multitenancy::PermissionGroup"
 msgstr ""
 
-#: ../content/index.rst:129
+#: ../content/index.rst:138
 msgid "Specifies the group that can set multitenancy for customer. Multitenancy does not apply to members of this group."
 msgstr ""
 
-#: ../content/index.rst:132
+#: ../content/index.rst:141
 msgid "About"
 msgstr ""
 
-#: ../content/index.rst:135
+#: ../content/index.rst:144
 msgid "Contact"
 msgstr ""
 
-#: ../content/index.rst:136
+#: ../content/index.rst:145
 msgid "Rother OSS GmbH"
 msgstr ""
 
-#: ../content/index.rst:137
+#: ../content/index.rst:146
 msgid "Email: hello@otobo.de"
 msgstr ""
 
-#: ../content/index.rst:138
+#: ../content/index.rst:147
 msgid "Web: https://otobo.de"
 msgstr ""
 
-#: ../content/index.rst:141
+#: ../content/index.rst:150
 msgid "Version"
 msgstr ""
 
-#: ../content/index.rst:142
+#: ../content/index.rst:151
 msgid "Author: |doc-vendor| / Version: |doc-version| / Date of release: |doc-datestamp|"
 msgstr ""
