@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: OTOBO Installation Guide rel-11.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 12:06+0000\n"
-"PO-Revision-Date: 2026-10-05 04:41+0000\n"
+"PO-Revision-Date: 2026-10-05 06:41+0000\n"
 "Last-Translator: Kozo Sakurai <sakurai@io-architect.com>\n"
 "Language-Team: Japanese <http://translate.otobo.org/projects/otobo-11-1/"
 "addons/manuals/customermultitenancy-documentation/ja/>\n"
@@ -23,11 +23,11 @@ msgstr ""
 
 #: ../content/index.rst:5
 msgid "Contents"
-msgstr ""
+msgstr "目次"
 
 #: ../content/index.rst:10
 msgid "Description"
-msgstr ""
+msgstr "説明"
 
 #: ../content/index.rst:11
 msgid ""
@@ -37,46 +37,55 @@ msgid ""
 "group. Those customers are then visible only for agents with access rights "
 "to the specific group. Also complete customer sources can be restricted."
 msgstr ""
+"このパッケージは、担当者に対する顧客および顧客ユーザー情報の表示を、グループ"
+"に基づいて制限できるようにします。デフォルトでは、すべての顧客が担当者に表示"
+"されます。このパッケージをインストールすると、顧客を担当者グループに割り当て"
+"ることができます。その顧客は、該当グループへのアクセス権を持つ担当者にのみ表"
+"示されるようになります。顧客ソース全体を制限することもできます。"
 
 #: ../content/index.rst:13
 msgid ""
 "Access rights on customer users will be inherited by the rights set on the "
 "customers, but can also individually be set."
 msgstr ""
+"顧客ユーザーに対するアクセス権は、顧客に設定された権限を継承しますが、個別に"
+"設定することもできます。"
 
 #: ../content/index.rst:15
 msgid ""
 "This functionality works for the customer (user) tables of OTOBO, and read "
 "only for remote databases as well as LDAP."
 msgstr ""
+"この機能は OTOBO の顧客（ユーザー）テーブルで動作し、リモートデータベースおよ"
+"び LDAP では読み取り専用で動作します。"
 
 #: ../content/index.rst:18
 msgid "System requirements"
-msgstr ""
+msgstr "システム要件"
 
 #: ../content/index.rst:21
 msgid "Framework"
-msgstr ""
+msgstr "フレームワーク"
 
 #: ../content/index.rst:22
 msgid "OTOBO 11.1.x"
-msgstr ""
+msgstr "OTOBO 11.1.x"
 
 #: ../content/index.rst:25
 msgid "Packages"
-msgstr ""
+msgstr "パッケージ"
 
 #: ../content/index.rst:26 ../content/index.rst:30
 msgid "\\-"
-msgstr ""
+msgstr "\\-"
 
 #: ../content/index.rst:29
 msgid "Third-party software"
-msgstr ""
+msgstr "サードパーティ製ソフトウェア"
 
 #: ../content/index.rst:33
 msgid "Limitations"
-msgstr ""
+msgstr "制限事項"
 
 #: ../content/index.rst:35
 msgid ""
@@ -89,6 +98,13 @@ msgid ""
 "queue containing a ticket of a customer they cannot view, the ticket is "
 "still shown, but the customer user information in the ticket will be empty."
 msgstr ""
+"このパッケージは、標準のチケット機能および顧客ユーザー機能における担当者の"
+"アクセスを制限することを目的としています。つまり、チケット作成画面などの「顧"
+"客ユーザー」選択や、顧客（ユーザー）情報センター、標準環境でユーザーが利用で"
+"きる AdminCustomer(User) で、担当者が顧客ユーザーを見つけられないようにします"
+"。チケットへのアクセスは変更されません。つまり、閲覧できない顧客のチケットを"
+"含むキューに担当者がアクセスできる場合、チケットは表示されますが、チケット内"
+"の顧客ユーザー情報は空になります。"
 
 #: ../content/index.rst:39
 msgid ""
@@ -96,10 +112,13 @@ msgid ""
 "does not affect elastic search results, and it is not intended to restrict "
 "dedicated admin functionalities like AdminCustomerUserCustomer."
 msgstr ""
+"このパッケージは現在、一部の高度な機能には対応していません。特に "
+"Elasticsearch の検索結果には影響せず、AdminCustomerUserCustomer のような専用"
+"の管理機能を制限することも想定していません。"
 
 #: ../content/index.rst:42
 msgid "Setup"
-msgstr ""
+msgstr "セットアップ"
 
 #: ../content/index.rst:44
 msgid ""
@@ -110,30 +129,40 @@ msgid ""
 "agent group in AdminCustomer and AdminCustomerUser the variables have to be "
 "added to the maps."
 msgstr ""
+"Config.pm で一連の調整が必要です。DB と LDAP のどちらの場合も、"
+"CustomerCompany ブロックおよび／または CustomerUser ブロックを変更する必要が"
+"あります（存在しない場合は、Kernel/Config/Defaults.pm から Kernel/Config.pm "
+"にコピーし、Kernel/Config.pm 側で調整してください）。AdminCustomer と "
+"AdminCustomerUser で担当者グループを設定できるようにするには、マップに変数を"
+"追加する必要があります。"
 
 #: ../content/index.rst:47
 msgid "Backends"
-msgstr ""
+msgstr "バックエンド"
 
 #: ../content/index.rst:50
 msgid "Database"
-msgstr ""
+msgstr "データベース"
 
 #: ../content/index.rst:52
 msgid ""
 "For the DB backend in both the CustomerCompany and CustomerUser definitions "
 "this can be added as follows."
 msgstr ""
+"DB バックエンドの場合、CustomerCompany と CustomerUser の両方の定義に次のよう"
+"に追加できます。"
 
 #: ../content/index.rst:67
 msgid "LDAP"
-msgstr ""
+msgstr "LDAP"
 
 #: ../content/index.rst:69
 msgid ""
 "For the LDAP backend in both the CustomerCompany and CustomerUser "
 "definitions this is similar."
 msgstr ""
+"LDAP バックエンドの場合も、CustomerCompany と CustomerUser の両方の定義で同様"
+"です。"
 
 #: ../content/index.rst:84
 msgid ""
@@ -141,6 +170,9 @@ msgid ""
 "attribute of the directory. Additionally in most cases a mapping between AD "
 "and OTOBO groups will be necessary. This is configured by the following."
 msgstr ""
+"ここでの 'otoboGroup' はあくまで例で、ディレクトリの属性に置き換える必要があ"
+"ります。また、ほとんどの場合、AD と OTOBO のグループの対応付けが必要になりま"
+"す。これは次のように設定します。"
 
 #: ../content/index.rst:106
 msgid "Global"
@@ -148,70 +180,76 @@ msgstr "グローバル"
 
 #: ../content/index.rst:108
 msgid "Independently of the backend, it can also be restricted completely."
-msgstr ""
+msgstr "バックエンドに関係なく、完全に制限することもできます。"
 
 #: ../content/index.rst:122
 msgid "Frontend"
-msgstr ""
+msgstr "フロントエンド"
 
 #: ../content/index.rst:124
 msgid ""
 "In the customer and customer user administrations the groups can now be "
 "configured or seen for read only backends."
 msgstr ""
+"顧客および顧客ユーザーの管理画面で、グループを設定できるようになります（読み"
+"取り専用のバックエンドでは閲覧のみ）。"
 
 #: ../content/index.rst:127
 msgid "Configuration Reference"
-msgstr ""
+msgstr "設定リファレンス"
 
 #: ../content/index.rst:130
 msgid "Core::Permission"
-msgstr ""
+msgstr "Core::Permission"
 
 #: ../content/index.rst:133
 msgid "Multitenancy"
-msgstr ""
+msgstr "マルチテナンシー"
 
 #: ../content/index.rst:134
 msgid "Enables the multitenancy function for customer and customer user."
-msgstr ""
+msgstr "顧客および顧客ユーザーのマルチテナンシー機能を有効にします。"
 
 #: ../content/index.rst:137
 msgid "Multitenancy::PermissionGroup"
-msgstr ""
+msgstr "Multitenancy::PermissionGroup"
 
 #: ../content/index.rst:138
 msgid ""
 "Specifies the group that can set multitenancy for customer. Multitenancy "
 "does not apply to members of this group."
 msgstr ""
+"顧客のマルチテナンシーを設定できるグループを指定します。このグループの"
+"メンバーにはマルチテナンシーは適用されません。"
 
 #: ../content/index.rst:141
 msgid "About"
-msgstr ""
+msgstr "概要"
 
 #: ../content/index.rst:144
 msgid "Contact"
-msgstr ""
+msgstr "連絡先"
 
 #: ../content/index.rst:145
 msgid "Rother OSS GmbH"
-msgstr ""
+msgstr "Rother OSS GmbH"
 
 #: ../content/index.rst:146
 msgid "Email: hello@otobo.de"
-msgstr ""
+msgstr "メール: hello@otobo.de"
 
 #: ../content/index.rst:147
 msgid "Web: https://otobo.de"
-msgstr ""
+msgstr "Web: https://otobo.de"
 
 #: ../content/index.rst:150
 msgid "Version"
-msgstr ""
+msgstr "バージョン"
 
 #: ../content/index.rst:151
 msgid ""
 "Author: |doc-vendor| / Version: |doc-version| / Date of release: |doc-"
 "datestamp|"
 msgstr ""
+"作成者: |doc-vendor| / バージョン: |doc-version| / リリース日: |doc-"
+"datestamp|"
