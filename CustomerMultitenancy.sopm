@@ -8,6 +8,7 @@
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
     <Description Lang="en">Group-based multitenancy for customer and customer user.</Description>
     <Description Lang="de">Gruppenbasierte Mandantenfähigkeit für Kunden und Kundenbenutzer.</Description>
+    <Description Lang="hu">Csoportalapú több-bérlős működés ügyfelek és ügyfél-felhasználók számára.</Description>
     <Filelist>
         <File Permission="660" Location="Custom/Kernel/Modules/AdminCustomerCompany.pm" />
         <File Permission="660" Location="Custom/Kernel/Modules/AdminCustomerUser.pm" />
