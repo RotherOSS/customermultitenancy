@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otobo_package version="1.1">
     <Name>CustomerMultitenancy</Name>
-    <Version>10.1.0</Version>
+    <Version>0.0.0</Version>
+    <Framework>10.1.x</Framework>
     <Vendor>Rother OSS GmbH</Vendor>
-    <URL>https://rother-oss.com/</URL>
+    <URL>https://otobo.io/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
     <Description Lang="en">Group-based multitenancy for customer and customer user.</Description>
     <Description Lang="de">Gruppenbasierte Mandantenfähigkeit für Kunden und Kundenbenutzer.</Description>
-    <Framework>10.1.x</Framework>
     <Filelist>
-        <File Permission="660" Location="Custom/Kernel/Modules/AdminCustomerCompany.pm"/>
-        <File Permission="660" Location="Custom/Kernel/Modules/AdminCustomerUser.pm"/>
-        <File Permission="660" Location="Custom/Kernel/System/CustomerCompany/DB.pm"/>
-        <File Permission="660" Location="Custom/Kernel/System/CustomerUser/DB.pm"/>
-        <File Permission="660" Location="Custom/Kernel/System/CustomerUser/LDAP.pm"/>
-        <File Permission="660" Location="Custom/Kernel/System/CustomerCompany.pm"/>
-        <File Permission="660" Location="Custom/Kernel/System/CustomerUser.pm"/>
-        <File Permission="660" Location="Kernel/Config/Files/XML/CustomerMultitenancy.xml"/>
-        <File Permission="660" Location="Kernel/Language/de_CustomerMultitenancy.pm"/>
+        <File Permission="660" Location="Custom/Kernel/Modules/AdminCustomerCompany.pm" />
+        <File Permission="660" Location="Custom/Kernel/Modules/AdminCustomerUser.pm" />
+        <File Permission="660" Location="Custom/Kernel/System/CustomerCompany/DB.pm" />
+        <File Permission="660" Location="Custom/Kernel/System/CustomerUser/DB.pm" />
+        <File Permission="660" Location="Custom/Kernel/System/CustomerUser/LDAP.pm" />
+        <File Permission="660" Location="Custom/Kernel/System/CustomerCompany.pm" />
+        <File Permission="660" Location="Custom/Kernel/System/CustomerUser.pm" />
+        <File Permission="660" Location="Kernel/Config/Files/XML/CustomerMultitenancy.xml" />
+        <File Permission="660" Location="Kernel/Language/de_CustomerMultitenancy.pm" />
     </Filelist>
     <DatabaseInstall Type="post">
         <TableAlter Name="customer_user">
