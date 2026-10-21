@@ -23,10 +23,6 @@ use utf8;
 sub Data {
     my $Self = shift;
 
-    # Template: AdminCustomerCompany
-    $Self->{Translation}->{'Limits the access of customer data to certain groups (multitenancy). Without selection, customer data is visible to all agents.'} =
-        '';
-
     # SysConfig
     $Self->{Translation}->{'Enables the multitenancy function for customer and customer user.'} =
         '';
