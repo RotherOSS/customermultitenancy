@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: OTOBO Installation Guide rel-10.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-14 12:34+0000\n"
-"PO-Revision-Date: 2026-10-14 16:41+0000\n"
+"PO-Revision-Date: 2026-10-21 11:41+0000\n"
 "Last-Translator: Balázs Úr <balazs@urbalazs.hu>\n"
 "Language-Team: Hungarian <http://translate.otobo.org/projects/otobo-10-1/"
 "addons/manuals/customermultitenancy-documentation/hu/>\n"
@@ -22,10 +22,8 @@ msgstr ""
 "Generated-By: Babel 2.4.0\n"
 
 #: ../content/index.rst:5
-#, fuzzy
-#| msgid "Contact"
 msgid "Contents"
-msgstr "Kapcsolat"
+msgstr "Tartalom"
 
 #: ../content/index.rst:10
 msgid "Description"
