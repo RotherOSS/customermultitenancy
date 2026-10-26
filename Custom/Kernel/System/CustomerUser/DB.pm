@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - aeb3ebd75e18f2836bd7c82ebeacfa4b2330fbd9 - Kernel/System/CustomerUser/DB.pm
+# $origin: otobo - 24649077cdf40101c37527e9cfa5920b96f8a9b6 - Kernel/System/CustomerUser/DB.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -1545,12 +1545,7 @@ sub CustomerUserAdd {
             }
         }
         else {
-            if ( $Param{ $Entry->[0] } ) {
-                $Value{ $Entry->[0] } = $Param{ $Entry->[0] };
-            }
-            else {
-                $Value{ $Entry->[0] } = '';
-            }
+            $Value{ $Entry->[0] } = $Param{ $Entry->[0] } // '';
         }
     }
 
@@ -1704,12 +1699,7 @@ sub CustomerUserUpdate {
             }
         }
         else {
-            if ( $Param{ $Entry->[0] } ) {
-                $Value{ $Entry->[0] } = $Param{ $Entry->[0] };
-            }
-            else {
-                $Value{ $Entry->[0] } = "";
-            }
+            $Value{ $Entry->[0] } = $Param{ $Entry->[0] } // '';
         }
     }
 

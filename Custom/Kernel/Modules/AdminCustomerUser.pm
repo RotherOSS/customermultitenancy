@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - deb99d60daf212ae73ec7feb78074f3f7ae563f8 - Kernel/Modules/AdminCustomerUser.pm
+# $origin: otobo - 24649077cdf40101c37527e9cfa5920b96f8a9b6 - Kernel/Modules/AdminCustomerUser.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -352,7 +352,7 @@ sub Run {
 
             # check remaining non-dynamic-field mandatory fields
             else {
-                $GetParam{ $Entry->[0] } = $ParamObject->GetParam( Param => $Entry->[0] ) || '';
+                $GetParam{ $Entry->[0] } = $ParamObject->GetParam( Param => $Entry->[0] ) // '';
 
                 next ENTRY if $UpdateOnlyPreferences;
 
@@ -633,7 +633,7 @@ sub Run {
 
             # check remaining non-dynamic-field mandatory fields
             else {
-                $GetParam{ $Entry->[0] } = $ParamObject->GetParam( Param => $Entry->[0] ) || '';
+                $GetParam{ $Entry->[0] } = $ParamObject->GetParam( Param => $Entry->[0] ) // '';
                 if ( !$GetParam{ $Entry->[0] } && $Entry->[4] ) {
                     $Errors{ $Entry->[0] . 'Invalid' } = 'ServerError';
                 }
@@ -1393,7 +1393,7 @@ sub _Edit {
         }
 # EO CustomerMultitenancy
         else {
-            $Param{Value} = $Param{ $Entry->[0] } || '';
+            $Param{Value} = $Param{ $Entry->[0] } // '';
         }
 
         # add form option
