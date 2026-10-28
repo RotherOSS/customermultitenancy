@@ -2,9 +2,9 @@
 # OTOBO is a web-based ticketing system for service organisations.
 # --
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - c14ca55a8b1d3d686e803c1398813b83d22091e5 - Kernel/System/CustomerUser/DB.pm
+# $origin: otobo - 2ad6f611d2abac5f4b3f6dc7e242a518b7d68069 - Kernel/System/CustomerUser/DB.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -36,6 +36,9 @@ our @ObjectDependencies = (
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     'Kernel::System::Encode',
+# Rother OSS / CustomerMultitenancy
+    'Kernel::System::Group',
+# EO CustomerMultitenancy
     'Kernel::System::Log',
     'Kernel::System::Main',
     'Kernel::System::Valid',
@@ -124,9 +127,7 @@ sub new {
     my @DynamicFieldMapEntries = grep { $_->[5] eq 'dynamic_field' } @{ $Self->{CustomerUserMap}->{Map} };
     $Self->{ConfiguredDynamicFieldNames} = { map { $_->[2] => 1 } @DynamicFieldMapEntries };
 
-    # ---
-    # RotherOSS:
-    # ---
+# Rother OSS / CustomerMultitenancy
     my $LayoutParam = $Kernel::OM->{Param}->{'Kernel::Output::HTML::Layout'};
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
@@ -152,7 +153,7 @@ sub new {
             }
         }
     }
-    # ---
+# EO CustomerMultitenancy
 
     return $Self;
 }
@@ -307,18 +308,18 @@ sub CustomerSearch {
             Priority => 'error',
             Message  => 'Need Search, UserLogin, PostMasterSearch, CustomerIDRaw or CustomerID!',
         );
+
         return;
     }
 
     # check cache
     my $CacheKey = join '::', map { $_ . '=' . $Param{$_} } sort keys %Param;
-    # ---
-    # RotherOSS: Use cache for multitenancy.
-    # ---
+# Rother OSS / CustomerMultitenancy
+    # Use cache for multitenancy.
     if ( $Self->{Multitenancy} ) {
         $CacheKey .= join '', map { '::GroupID=' . $_ } @{ $Self->{UserGroupIDs} };
     }
-    # ---
+# EO CustomerMultitenancy
     if ( $Self->{CacheObject} ) {
         my $Users = $Self->{CacheObject}->Get(
             Type => $Self->{CacheType} . '_CustomerSearch',
@@ -379,9 +380,8 @@ sub CustomerSearch {
         $SQL .= $QueryCondition{SQL};
         push @Bind, @{ $QueryCondition{Values} };
 
-        # ---
-        # RotherOSS: Don't search for customer users without group permission.
-        # ---
+# Rother OSS / CustomerMultitenancy
+        # Don't search for customer users without group permission.
         if ( $Self->{Multitenancy} ) {
             if ( $Self->{CustomerUserMap}->{CustomerCompanySupport} ) {
                 # TODO: Workaround until the search gets changed.
@@ -435,7 +435,7 @@ sub CustomerSearch {
                 $SQL .= " AND ($InCondition)";
             }
         }
-        # ---
+# EO CustomerMultitenancy
 
         $SQL .= ' ';
     }
@@ -507,6 +507,7 @@ sub CustomerSearch {
     }
     elsif ( $Param{CustomerIDRaw} ) {
 
+        # there is no '*' wildcard expansion when searching for CustomerIDRaw
         push @Bind, \$Param{CustomerIDRaw};
 
         if ( $Self->{CaseSensitive} ) {
@@ -657,7 +658,7 @@ sub CustomerSearchDetail {
         return;
     }
 
-    my $Valid = defined $Param{Valid} ? $Param{Valid} : 1;
+    my $Valid = $Param{Valid} // 1;
 
     $Param{Limit} //= '';
 
@@ -1808,7 +1809,7 @@ sub SetPassword {
     }
 
     # crypt with md5 crypt
-    elsif ( $CryptType eq 'md5' || !$CryptType ) {
+    elsif ( $CryptType eq 'md5' ) {
 
         # encode output, needed by unix_md5_crypt() only non utf8 signs
         $EncodeObject->EncodeOutput( \$Pw );

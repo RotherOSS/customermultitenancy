@@ -2,9 +2,9 @@
 # OTOBO is a web-based ticketing system for service organisations.
 # --
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - c14ca55a8b1d3d686e803c1398813b83d22091e5 - Kernel/System/CustomerCompany/DB.pm
+# $origin: otobo - ff9e297baf287e16071d3ac6ad7f6c13f11ac7fa - Kernel/System/CustomerCompany/DB.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -24,10 +24,16 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
+# Rother OSS / CustomerMultitenancy
+    'Kernel::Config',
+# EO CustomerMultitenancy
     'Kernel::System::Cache',
     'Kernel::System::DB',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
+# Rother OSS / CustomerMultitenancy
+    'Kernel::System::Group',
+# EO CustomerMultitenancy
     'Kernel::System::Log',
     'Kernel::System::Valid',
 );
@@ -94,9 +100,7 @@ sub new {
     my @DynamicFieldMapEntries = grep { $_->[5] eq 'dynamic_field' } @{ $Self->{CustomerCompanyMap}->{Map} };
     $Self->{ConfiguredDynamicFieldNames} = { map { $_->[2] => 1 } @DynamicFieldMapEntries };
 
-    # ---
-    # RotherOSS:
-    # ---
+# Rother OSS / CustomerMultitenancy
     my $LayoutParam = $Kernel::OM->{Param}->{'Kernel::Output::HTML::Layout'};
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
@@ -122,7 +126,7 @@ sub new {
             }
         }
     }
-    # ---
+# EO CustomerMultitenancy
 
     return $Self;
 }
@@ -146,13 +150,12 @@ sub CustomerCompanyList {
 
         $CacheType = $Self->{CacheType} . '_CustomerCompanyList';
         $CacheKey  = "CustomerCompanyList::${Valid}::${Limit}::" . ( $Param{Search} || '' );
-        # ---
-        # RotherOSS: Use cache for multitenancy.
-        # ---
+# Rother OSS / CustomerMultitenancy
+        # Use cache for multitenancy.
         if ( $Self->{Multitenancy} ) {
             $CacheKey .= join '', map { '::GroupID=' . $_ } @{ $Self->{UserGroupIDs} };
         }
-        # ---
+# EO CustomerMultitenancy
         my $Data = $Self->{CacheObject}->Get(
             Type => $CacheType,
             Key  => $CacheKey,
@@ -210,9 +213,8 @@ sub CustomerCompanyList {
             push @Bind,       @{ $QueryCondition{Values} };
         }
 
-        # ---
-        # RotherOSS: Don't search for customer without group permission.
-        # ---
+# Rother OSS / CustomerMultitenancy
+        # Don't search for customer without group permission.
         if ( $Self->{Multitenancy} ) {
             # Get the column name where the group ID is stored.
             my $GroupIDCol;
@@ -259,7 +261,7 @@ sub CustomerCompanyList {
                 push @Conditions, " ($InCondition)";
             }
         }
-        # ---
+# EO CustomerMultitenancy
     }
 
     # dynamic field handling
@@ -460,7 +462,7 @@ sub CustomerCompanySearchDetail {
         }
     }
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Self->{DBObject};
 
     # Assemble the conditions used in the WHERE clause.
     my @SQLWhere;
@@ -646,7 +648,7 @@ sub CustomerCompanySearchDetail {
         #   from the dynamic field search.
         if (@DynamicFieldCustomerIDs) {
 
-            my $SQLQueryInCondition = $Kernel::OM->Get('Kernel::System::DB')->QueryInCondition(
+            my $SQLQueryInCondition = $DBObject->QueryInCondition(
                 Key      => $Self->{CustomerCompanyKey},
                 Values   => \@DynamicFieldCustomerIDs,
                 BindMode => 0,
@@ -664,7 +666,7 @@ sub CustomerCompanySearchDetail {
 
         next FIELD if !@{ $Param{ $Field->{Name} } };
 
-        my $SQLQueryInCondition = $Kernel::OM->Get('Kernel::System::DB')->QueryInCondition(
+        my $SQLQueryInCondition = $DBObject->QueryInCondition(
             Key      => $Field->{DatabaseField},
             Values   => $Param{ $Field->{Name} },
             BindMode => 0,

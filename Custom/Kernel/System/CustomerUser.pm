@@ -2,9 +2,9 @@
 # OTOBO is a web-based ticketing system for service organisations.
 # --
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - c14ca55a8b1d3d686e803c1398813b83d22091e5 - Kernel/System/CustomerUser.pm
+# $origin: otobo - 38263acff3a1cdb5418277450b9efbb81cbc2d25 - Kernel/System/CustomerUser.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,11 @@ use warnings;
 
 use parent qw(Kernel::System::EventHandler);
 
+# core modules
+
+# CPAN modules
+
+# OTOBO modules
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -34,10 +39,14 @@ our @ObjectDependencies = (
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     'Kernel::System::Encode',
-    'Kernel::System::Group',  # RotherOSS:
+# Rother OSS / CustomerMultitenancy
+    'Kernel::System::Group',
+# EO CustomerMultitenancy
     'Kernel::System::Log',
     'Kernel::System::Main',
-    'Kernel::System::User',  # RotherOSS:
+# Rother OSS / CustomerMultitenancy
+    'Kernel::System::User',
+# EO CustomerMultitenancy
     'Kernel::System::Valid',
 );
 
@@ -63,8 +72,7 @@ sub new {
     my ( $Type, %Param ) = @_;
 
     # allocate new hash for object
-    my $Self = {};
-    bless( $Self, $Type );
+    my $Self = bless {}, $Type;
 
     $Self->{CacheType} = 'CustomerUser';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
@@ -83,9 +91,7 @@ sub new {
         $Self->{PreferencesObject} = $GeneratorModule->new();
     }
 
-    # ---
-    # RotherOSS:
-    # ---
+# Rother OSS / CustomerMultitenancy
     my $LayoutParam = $Kernel::OM->{Param}->{'Kernel::Output::HTML::Layout'};
 
     # Check if multitenancy is enabled and the request is coming from a user.
@@ -110,25 +116,24 @@ sub new {
             }
         }
     }
-    # ---
+# EO CustomerMultitenancy
 
     # load customer user backend module
     SOURCE:
     for my $Count ( '', 1 .. 10 ) {
 
-        next SOURCE if !$ConfigObject->Get("CustomerUser$Count");
-        # ---
-        # RotherOSS: Check if the user has permission to access the source.
-        # ---
+        next SOURCE unless $ConfigObject->Get("CustomerUser$Count");
+# Rother OSS / CustomerMultitenancy
+        # Check if the user has permission to access the source.
         my $CustomerUserGroup = $ConfigObject->Get("CustomerUser$Count")->{CustomerUserGroup};
 
         # The user does not have permission to get information from this source.
         if ( $Self->{Multitenancy} && $CustomerUserGroup ) {
-            if ( !grep( /^$CustomerUserGroup$/, @{ $Self->{UserGroups} } ) ) {
+            if ( !grep { /^$CustomerUserGroup$/ } @{ $Self->{UserGroups} } ) {
                 next SOURCE;
             }
         }
-        # ---
+# EO CustomerMultitenancy
 
         my $GenericModule = $ConfigObject->Get("CustomerUser$Count")->{Module};
         if ( !$MainObject->Require($GenericModule) ) {
@@ -188,9 +193,9 @@ sub CustomerSourceList {
 
 =head2 CustomerSearch()
 
-to search users
+to search customer users.
 
-    # text search
+    # text search in the customer search fields
     my %List = $CustomerUserObject->CustomerSearch(
         Search => '*some*', # also 'hans+huber' possible
         Valid  => 1,        # (optional) default 1
@@ -210,10 +215,29 @@ to search users
     );
 
     # search by CustomerID
+    # It depends on the data backend when an '*' is considered a wildcard.
+    # The DB backend considers '*' as an wildcard.
+    # The LDAP backend does not do so.
     my %List = $CustomerUserObject->CustomerSearch(
         CustomerID       => 'CustomerID123',
         Valid            => 1,                # (optional) default 1
     );
+
+    # Search by CustomerID without wildcard expansion.
+    # So searching by 'Alois*' would find only 'Alois*' and not 'Alois' or 'Aloisia'.
+    my %List = $CustomerUserObject->CustomerSearch(
+        CustomerIDRaw    => 'CustomerID123',
+        Valid            => 1,                # (optional) default 1
+    );
+
+Returns a hash like:
+
+    {
+        'tina' => '"Tina Tester" <tina@example.com>',
+        'toni' => '"Toni Tester" <toni@example.com>',
+    }
+
+The method is misnamed as C<CustomerSearch> searches for customer users, not customers aka customer companies.
 
 =cut
 
@@ -341,11 +365,11 @@ sub CustomerSearch {
         %Data = ( %SubData, %Data );
     }
 
-    # ---
-    # RotherOSS: Check if the user has permission to see this customer user. 
+# Rother OSS / CustomerMultitenancy
+    # Check if the user has permission to see this customer user.
     # TODO: Remove this if the DB/LDAP function CustomerSearch is fully implemented.
-    # ---
     if ( $Self->{Multitenancy} ) {
+        CUSTOMERUSERLOGIN:
         for my $CustomerUserLogin ( keys %Data ) {
             my %UserData = $Self->CustomerUserDataGet(
                 User => $CustomerUserLogin,
@@ -353,11 +377,11 @@ sub CustomerSearch {
 
             if ( !%UserData ) {
                 delete $Data{$CustomerUserLogin};
-                next;
+                next CUSTOMERUSERLOGIN;
             }
         }
     }
-    # ---
+# EO CustomerMultitenancy
 
     return %Data;
 }
@@ -380,12 +404,16 @@ The count of results is returned when the parameter C<Result = 'COUNT'> is passe
         UserLogin     => 'example*',                                    # (optional)
         UserFirstname => 'Firstn*',                                     # (optional)
 
+        # search for valid users only per default,
+        # pass 0 in order to also search for invalid users
+        Valid     => 1,                                                 # (optional) default 1
+
         # special parameters
         CustomerCompanySearchCustomerIDs => [ 'example.com' ],          # (optional)
         ExcludeUserLogins                => [ 'example', 'doejohn' ],   # (optional)
 
         # array parameters are used with logical OR operator (all values are possible which
-        are defined in the config selection hash for the field)
+        # are defined in the config selection hash for the field)
         UserCountry              => [ 'Austria', 'Germany', ],          # (optional)
 
         # DynamicFields
@@ -422,15 +450,15 @@ The count of results is returned when the parameter C<Result = 'COUNT'> is passe
         # ignored if the result type is 'COUNT'
     );
 
-Returns:
+Returns a list of customer users when $Result => 'ARRAY' was passed:
 
-Result: 'ARRAY'
+    $CustomerUserIDs = [ 'adaldrida', 'adamanta', 'adalgrim ' ];
+    $CustomerUserIDs = []; # when no customer users had been found
 
-    @CustomerUserIDs = ( 1, 2, 3 );
+Returns a count of customer users when $Result => 'COUNT' was passed:
 
-Result: 'COUNT'
-
-    $CustomerUserIDs = 10;
+    $CustomerUserIDs = 3;
+    $CustomerUserIDs = 0; # when no customer users had been found
 
 =cut
 
@@ -543,9 +571,8 @@ sub CustomerSearchDetail {
             @IDs = map { $_->{UserLogin} } @UserDataList;
         }
 
-        # ---
-        # RotherOSS: Check permission for every single customer user.
-        # ---
+# Rother OSS / CustomerMultitenancy
+        # Check permission for every single customer user.
         if ( $Self->{Multitenancy} ) {
             my @NewIDS = @IDs;
             @IDs = ();
@@ -556,11 +583,11 @@ sub CustomerSearchDetail {
                 );
 
                 if (%UserData) {
-                    push @IDs, $ID; 
+                    push @IDs, $ID;
                 }
             }
         }
-        # ---
+# EO CustomerMultitenancy
 
         return \@IDs;
     }
@@ -800,9 +827,8 @@ sub CustomerIDList {
     @Tmp{@Data} = undef;
     @Data = sort { lc $a cmp lc $b } keys %Tmp;
 
-    # ---
-    # RotherOSS: Don't return customer IDs if the agent does not have permission to view.
-    # ---
+# Rother OSS / CustomerMultitenancy
+    # Don't return customer IDs if the agent does not have permission to view.
     if ( $Self->{Multitenancy} ) {
         my @CleanedCustomerIDs;
 
@@ -818,7 +844,7 @@ sub CustomerIDList {
 
         @Data = @CleanedCustomerIDs;
     }
-    # ---
+# EO CustomerMultitenancy
 
     return @Data;
 }
@@ -903,9 +929,8 @@ sub CustomerIDs {
         push @CustomerIDs, $RelatedCustomerID;
     }
 
-    # ---
-    # RotherOSS: Don't return customer IDs if the agent does not have permission to view.
-    # ---
+# Rother OSS / CustomerMultitenancy
+    # Don't return customer IDs if the agent does not have permission to view.
     if ( $Self->{Multitenancy} ) {
         my @CleanedCustomerIDs;
 
@@ -921,7 +946,7 @@ sub CustomerIDs {
 
         @CustomerIDs = @CleanedCustomerIDs;
     }
-    # ---
+# EO CustomerMultitenancy
 
     # return customer ids
     return @CustomerIDs;
@@ -931,16 +956,19 @@ sub CustomerIDs {
 
 get user data (UserLogin, UserFirstname, UserLastname, UserEmail, ...)
 
-    my %User = $CustomerUserObject->CustomerUserDataGet(
+    my %CustomerUserData = $CustomerUserObject->CustomerUserDataGet(
         User => 'franz',
     );
+
+When there are multiple backends then only the data from the first backend where the customer user is found.
+An empty list is returned when the customer user was't found in any backend.
 
 =cut
 
 sub CustomerUserDataGet {
     my ( $Self, %Param ) = @_;
 
-    return if !$Param{User};
+    return unless $Param{User};
 
     # fetch dynamic field configurations for CustomerUser.
     my $DynamicFieldConfigs = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
@@ -1013,9 +1041,8 @@ sub CustomerUserDataGet {
             }
         }
 
-        # ---
-        # RotherOSS: Check permission.
-        # ---
+# Rother OSS / CustomerMultitenancy
+        # Check permission.
         if ( $Customer{UserGroupID} ) {
             my $UserGroupIDSync = $Self->{"CustomerUser$Count"}->{CustomerUserMap}->{UserGroupIDSync};
 
@@ -1036,16 +1063,16 @@ sub CustomerUserDataGet {
             }
 
             # Check if any limits are set.
-            if ( $Self->{Multitenancy} && !grep( /^$Customer{UserGroupID}$/, @{ $Self->{UserGroupIDs} } ) ) {
+            if ( $Self->{Multitenancy} && !grep { /^$Customer{UserGroupID}$/ } @{ $Self->{UserGroupIDs} } ) {
                 # The user does not have access to this information.
                 return;
             }
-        } 
+        }
         # If there are no group settings, check if permission on customer company is permitted.
         elsif ( $Self->{Multitenancy} && !$Customer{UserGroupID} && ( !%Company || !$Company{CustomerID} ) ) {
             return;
         }
-        # ---
+# EO CustomerMultitenancy
 
         # return customer data
         return (
@@ -1066,12 +1093,12 @@ to add new customer users
 
     my $UserLogin = $CustomerUserObject->CustomerUserAdd(
         Source         => 'CustomerUser', # CustomerUser source config
-        UserFirstname  => 'Huber',
-        UserLastname   => 'Manfred',
+        UserFirstname  => 'Manfred',
+        UserLastname   => 'Huber',
         UserCustomerID => 'A124',
         UserLogin      => 'mhuber',
         UserPassword   => 'some-pass', # not required
-        UserEmail      => 'email@example.com',
+        UserEmail      => 'manfred.huber@example.com',
         ValidID        => 1,
         UserID         => 123,
     );
@@ -1098,9 +1125,8 @@ sub CustomerUserAdd {
         }
     }
 
-    # ---
-    # RotherOSS: Check if the user has permission to add the UserGroupID.
-    # ---
+# Rother OSS / CustomerMultitenancy
+    # Check if the user has permission to add the UserGroupID.
     if ( $Self->{Multitenancy} ) {
         delete $Param{UserGroupID};
     }
@@ -1123,7 +1149,7 @@ sub CustomerUserAdd {
             }
         }
     }
-    # ---
+# EO CustomerMultitenancy
 
     # store customer user data
     my $Result = $Self->{ $Param{Source} }->CustomerUserAdd(%Param);
@@ -1195,9 +1221,8 @@ sub CustomerUserUpdate {
         return;
     }
 
-    # ---
-    # RotherOSS: Check if the user has permission to change the UserGroupID.
-    # ---
+# Rother OSS / CustomerMultitenancy
+    # Check if the user has permission to change the UserGroupID.
     if ( $Self->{Multitenancy} ) {
         # Set the UserGroupID to the current UserGroupID.
         if ( $User{UserGroupID} ) {
@@ -1223,7 +1248,7 @@ sub CustomerUserUpdate {
             }
         }
     }
-    # ---
+# EO CustomerMultitenancy
 
     my $Result = $Self->{ $User{Source} }->CustomerUserUpdate(%Param);
     return if !$Result;
