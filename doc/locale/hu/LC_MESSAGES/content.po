@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: OTOBO Installation Guide rel-11.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 12:01+0000\n"
-"PO-Revision-Date: 2026-09-03 18:41+0000\n"
+"PO-Revision-Date: 2026-10-29 19:41+0000\n"
 "Last-Translator: Balázs Úr <balazs@urbalazs.hu>\n"
 "Language-Team: Hungarian <http://translate.otobo.org/projects/otobo-11-0/"
 "addons/manuals/customermultitenancy-documentation/hu/>\n"
@@ -22,10 +22,8 @@ msgstr ""
 "Generated-By: Babel 2.4.0\n"
 
 #: ../content/index.rst:5
-#, fuzzy
-#| msgid "Contact"
 msgid "Contents"
-msgstr "Kapcsolat"
+msgstr "Tartalom"
 
 #: ../content/index.rst:10
 msgid "Description"
@@ -39,18 +37,29 @@ msgid ""
 "group. Those customers are then visible only for agents with access rights "
 "to the specific group. Also complete customer sources can be restricted."
 msgstr ""
+"Ez a csomag lehetővé teszi az ügyfél és az ügyfél-felhasználó információira "
+"vonatkozó csoportalapú korlátozásokat az ügyintézők számára. "
+"Alapértelmezetten az összes ügyfél látható az ügyintézőknek. A csomag "
+"telepítése után az ügyfelek hozzárendelhetők egy ügyintézői csoporthoz. Ezek "
+"az ügyfelek ezután csak azoknak az ügyintézőknek lesznek láthatók, akik "
+"hozzáférési jogokkal rendelkeznek az adott csoporthoz. Teljes ügyfélforrások "
+"is korlátozhatók."
 
 #: ../content/index.rst:13
 msgid ""
 "Access rights on customer users will be inherited by the rights set on the "
 "customers, but can also individually be set."
 msgstr ""
+"Az ügyfél-felhasználókra vonatkozó hozzáférési jogok az ügyfeleknél "
+"beállított jogokat fogják örökölni, de egyénileg is beállíthatók."
 
 #: ../content/index.rst:15
 msgid ""
 "This functionality works for the customer (user) tables of OTOBO, and read "
 "only for remote databases as well as LDAP."
 msgstr ""
+"Ez a funkció az OTOBO ügyfél (felhasználó) tábláinál működik, és csak "
+"olvasható távoli adatbázisok, valamint LDAP esetén."
 
 #: ../content/index.rst:18
 msgid "System requirements"
@@ -78,7 +87,7 @@ msgstr "Harmadik féltől származó szoftverek"
 
 #: ../content/index.rst:33
 msgid "Limitations"
-msgstr ""
+msgstr "Korlátozások"
 
 #: ../content/index.rst:35
 msgid ""
@@ -91,6 +100,16 @@ msgid ""
 "queue containing a ticket of a customer they cannot view, the ticket is "
 "still shown, but the customer user information in the ticket will be empty."
 msgstr ""
+"A csomag célja, hogy korlátozza az ügyintézők hozzáférését a szabványos "
+"jegykezelési és ügyfél-felhasználói funkcionalitáson belül. Vagyis "
+"megakadályozza, hogy az ügyintézők megtalálják az ügyfél-felhasználókat a "
+"jegy létrehozása és hasonló képernyőkön lévő „Ügyfél-felhasználó” "
+"kiválasztásokban, valamint az ügyfél (felhasználó) információs központokban "
+"és az AdminCustomer(User) képernyőkön, amelyeket a felhasználók a szabványos "
+"telepítésekben használhatnak. A jegyekhez való hozzáférés nem változik, "
+"vagyis ha egy ügyintézőnek hozzáférése van egy olyan várólistához, amely "
+"olyan ügyfél jegyét tartalmazza, amelyet nem láthat, a jegy továbbra is "
+"megjelenik, de a jegyben lévő ügyfél-felhasználói információk üresek lesznek."
 
 #: ../content/index.rst:39
 msgid ""
@@ -98,6 +117,10 @@ msgid ""
 "does not affect elastic search results, and it is not intended to restrict "
 "dedicated admin functionalities like AdminCustomerUserCustomer."
 msgstr ""
+"A csomag jelenleg nem támogat néhány speciális funkciót, nevezetesen nem "
+"befolyásolja az Elasticsearch keresési eredményeit, és nem célja, hogy "
+"korlátozza az olyan dedikált adminisztrátori funkciókat, mint ami az "
+"AdminCustomerUserCustomer képernyőn érhető el."
 
 #: ../content/index.rst:42
 msgid "Setup"
@@ -112,30 +135,41 @@ msgid ""
 "agent group in AdminCustomer and AdminCustomerUser the variables have to be "
 "added to the maps."
 msgstr ""
+"A „Config.pm” fájlban néhány módosítást kötelező elvégezni. Mind az "
+"adatbázis, mind az LDAP esetén változtatni szükséges a „CustomerCompany” és/"
+"vagy a „CustomerUser” blokkokat. Ha nem rendelkezik ezekkel, akkor másolja "
+"át a „Kernel/Config/Defaults.pm” fájlból a „Kernel/Config.pm” fájlba, és az "
+"utóbbiban módosítsa azokat. Az ügyintézői csoport beállításának "
+"engedélyezéséhez az „AdminCustomer” és az „AdminCustomerUser” blokkokban a "
+"változókat hozzá kell adni a leképezésekhez."
 
 #: ../content/index.rst:47
 msgid "Backends"
-msgstr ""
+msgstr "Háttérprogramok"
 
 #: ../content/index.rst:50
 msgid "Database"
-msgstr ""
+msgstr "Adatbázis"
 
 #: ../content/index.rst:52
 msgid ""
 "For the DB backend in both the CustomerCompany and CustomerUser definitions "
 "this can be added as follows."
 msgstr ""
+"Az adatbázis háttérprogramnál mind a „CustomerCompany”, mind a „CustomerUser"
+"” meghatározásaiban ez az alábbiak szerint adható hozzá."
 
 #: ../content/index.rst:67
 msgid "LDAP"
-msgstr ""
+msgstr "LDAP"
 
 #: ../content/index.rst:69
 msgid ""
 "For the LDAP backend in both the CustomerCompany and CustomerUser "
 "definitions this is similar."
 msgstr ""
+"Az LDAP háttérprogramnál mind a „CustomerCompany”, mind a „CustomerUser” "
+"meghatározásaiban ez hasonló."
 
 #: ../content/index.rst:84
 msgid ""
@@ -143,14 +177,18 @@ msgid ""
 "attribute of the directory. Additionally in most cases a mapping between AD "
 "and OTOBO groups will be necessary. This is configured by the following."
 msgstr ""
+"Az „otoboGroup” itt csak példaként szerepel, és ki kell cserélni a könyvtár "
+"attribútumára. Ezenkívül a legtöbb esetben szükség lesz az Active Directory "
+"és az OTOBO csoportjai közötti leképezésre. Ezt a következőképpen lehet "
+"beállítani."
 
 #: ../content/index.rst:106
 msgid "Global"
-msgstr ""
+msgstr "Globális"
 
 #: ../content/index.rst:108
 msgid "Independently of the backend, it can also be restricted completely."
-msgstr ""
+msgstr "A háttérprogramtól függetlenül ez teljesen is letiltható."
 
 #: ../content/index.rst:122
 msgid "Frontend"
@@ -161,6 +199,8 @@ msgid ""
 "In the customer and customer user administrations the groups can now be "
 "configured or seen for read only backends."
 msgstr ""
+"Az ügyfél és az ügyfél-felhasználó adminisztrációiban a csoportok mostantól "
+"beállíthatók vagy megtekinthetők csak olvasható háttérprogramoknál."
 
 #: ../content/index.rst:127
 msgid "Configuration Reference"
@@ -168,25 +208,30 @@ msgstr "Beállítások hivatkozása"
 
 #: ../content/index.rst:130
 msgid "Core::Permission"
-msgstr ""
+msgstr "Core::Permission"
 
 #: ../content/index.rst:133
 msgid "Multitenancy"
-msgstr ""
+msgstr "Multitenancy"
 
 #: ../content/index.rst:134
 msgid "Enables the multitenancy function for customer and customer user."
 msgstr ""
+"Engedélyezi a több-bérlős működési funkciót az ügyfél és az ügyfél-"
+"felhasználó számára."
 
 #: ../content/index.rst:137
 msgid "Multitenancy::PermissionGroup"
-msgstr ""
+msgstr "Multitenancy::PermissionGroup"
 
 #: ../content/index.rst:138
 msgid ""
 "Specifies the group that can set multitenancy for customer. Multitenancy "
 "does not apply to members of this group."
 msgstr ""
+"Meghatározza azt a csoportot, amely beállíthat több-bérlős működést az "
+"ügyfélnél. A több-bérlős működés nem vonatkozik ennek a csoportnak a "
+"tagjaira."
 
 #: ../content/index.rst:141
 msgid "About"
@@ -202,11 +247,11 @@ msgstr "Rother OSS GmbH"
 
 #: ../content/index.rst:146
 msgid "Email: hello@otobo.de"
-msgstr ""
+msgstr "E-mail: hello@otobo.de"
 
 #: ../content/index.rst:147
 msgid "Web: https://otobo.de"
-msgstr ""
+msgstr "Web: https://otobo.de"
 
 #: ../content/index.rst:150
 msgid "Version"
