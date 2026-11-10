@@ -18,6 +18,7 @@
         <File Permission="660" Location="Custom/Kernel/System/CustomerUser.pm" />
         <File Permission="660" Location="Kernel/Config/Files/XML/CustomerMultitenancy.xml" />
         <File Permission="660" Location="Kernel/Language/de_CustomerMultitenancy.pm" />
+        <File Permission="660" Location="Kernel/Language/hu_CustomerMultitenancy.pm" />
     </Filelist>
     <DatabaseInstall Type="post">
         <TableAlter Name="customer_user">

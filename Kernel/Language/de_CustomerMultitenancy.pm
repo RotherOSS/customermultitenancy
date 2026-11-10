@@ -25,9 +25,9 @@ sub Data {
 
     # SysConfig
     $Self->{Translation}->{'Enables the multitenancy function for customer and customer user.'} =
-        '';
+        'Aktiviert die Funktion der Mandantenfähigkeit für Kunden und Kundenbenutzer.';
     $Self->{Translation}->{'Specifies the group that can set multitenancy for customer. Multitenancy does not apply to members of this group.'} =
-        '';
+        'Definiert die Gruppe, welche die Mandantenfähigkeit für Kunden festlegen kann. Die Mandantenfähigkeit gilt nicht für Mitglieder dieser Gruppe.';
 
 
     push @{ $Self->{JavaScriptStrings} // [] }, (
