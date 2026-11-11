@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: OTOBO Installation Guide rel-11.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 12:06+0000\n"
-"PO-Revision-Date: 2026-11-11 09:00+0000\n"
+"PO-Revision-Date: 2026-11-11 11:00+0000\n"
 "Last-Translator: Jasmin Hammes <jasmin.hammes@rother-oss.com>\n"
 "Language-Team: German <http://translate.otobo.org/projects/otobo-11-1/addons/"
 "manuals/customermultitenancy-documentation/de/>\n"
@@ -49,12 +49,16 @@ msgid ""
 "Access rights on customer users will be inherited by the rights set on the "
 "customers, but can also individually be set."
 msgstr ""
+"Zugriffsrechte für Kundenbenutzer werden von den für die Kunden festgelegten "
+"Rechten übernommen, können aber auch individuell festgelegt werden."
 
 #: ../content/index.rst:15
 msgid ""
 "This functionality works for the customer (user) tables of OTOBO, and read "
 "only for remote databases as well as LDAP."
 msgstr ""
+"Dieser Mechanismus funktioniert für Kunden(benutzer)-Tabellen von OTOBO und "
+"lesend sowohl für Remote-Datenbanken, als auch LDAP."
 
 #: ../content/index.rst:18
 msgid "System requirements"
@@ -84,7 +88,7 @@ msgstr "Drittanbieter-Software"
 
 #: ../content/index.rst:33
 msgid "Limitations"
-msgstr ""
+msgstr "Einschränkungen"
 
 #: ../content/index.rst:35
 msgid ""
@@ -97,6 +101,16 @@ msgid ""
 "queue containing a ticket of a customer they cannot view, the ticket is "
 "still shown, but the customer user information in the ticket will be empty."
 msgstr ""
+"Das Paket soll den Zugriff von Agenten innerhalb der Standard-Ticketing- und "
+"Kundenbenutzer-Funktionalität einschränken. D. h. es verhindert, dass "
+"Agenten Kundenbenutzer in den Auswahlfeldern \"Kundenbenutzer\" bei der "
+"Ticketerstellung und ähnlichen Bildschirmen finden. Ebenso in den Kunden"
+"(benutzer)-Informationszentren und in Admin -> Kunde bzw. Kundenbenutzer, "
+"die in Standardinstallationen von den Benutzern verwendet werden können. Der "
+"Ticketzugriff wird nicht geändert, das heißt, wenn ein Agent Zugriff auf "
+"eine Queue hat, die ein Ticket eines Kunden enthält, den er nicht einsehen "
+"kann, wird das Ticket weiterhin angezeigt, aber die "
+"Kundenbenutzerinformationen im Ticket sind leer."
 
 #: ../content/index.rst:39
 msgid ""
@@ -104,6 +118,10 @@ msgid ""
 "does not affect elastic search results, and it is not intended to restrict "
 "dedicated admin functionalities like AdminCustomerUserCustomer."
 msgstr ""
+"Das Paket deckt derzeit einige erweiterte Funktionalitäten nicht ab, "
+"insbesondere betrifft es keine Elasticsearch-Ergebnisse, und es ist nicht "
+"dafür vorgesehen, dedizierte Admin-Funktionalitäten wie Admin -> Kunden"
+"(benutzer)einzuschränken."
 
 #: ../content/index.rst:42
 msgid "Setup"
@@ -118,20 +136,29 @@ msgid ""
 "agent group in AdminCustomer and AdminCustomerUser the variables have to be "
 "added to the maps."
 msgstr ""
+"In der Kernel/Config.pm ist eine Reihe von Anpassungen zwingend "
+"erforderlich: Für DB und LDAP ist es notwendig, die Blöcke CustomerCompany "
+"und/oder CustomerUser zu ändern. (Falls diese bei Ihnen nicht vorhanden "
+"sind, kopieren Sie sie bitte aus Kernel/Config/Defaults.pm nach Kernel/"
+"Config.pm und passen Sie sie dort an!) Um die Einstellung der Agentengruppe "
+"in AdminCustomer und AdminCustomerUser zu ermöglichen, müssen die Variablen "
+"zu den Maps hinzugefügt werden."
 
 #: ../content/index.rst:47
 msgid "Backends"
-msgstr ""
+msgstr "Backends"
 
 #: ../content/index.rst:50
 msgid "Database"
-msgstr ""
+msgstr "Datenbank"
 
 #: ../content/index.rst:52
 msgid ""
 "For the DB backend in both the CustomerCompany and CustomerUser definitions "
 "this can be added as follows."
 msgstr ""
+"Für das DB-Backend kann dies sowohl in den CustomerCompany- als auch in den "
+"CustomerUser-Definitionen wie folgt hinzugefügt werden."
 
 #: ../content/index.rst:67
 msgid "LDAP"
@@ -142,6 +169,8 @@ msgid ""
 "For the LDAP backend in both the CustomerCompany and CustomerUser "
 "definitions this is similar."
 msgstr ""
+"Für das LDAP-Backend verhält es sich sowohl in den CustomerCompany- als auch "
+"in den CustomerUser-Definitionen ähnlich."
 
 #: ../content/index.rst:84
 msgid ""
@@ -149,6 +178,10 @@ msgid ""
 "attribute of the directory. Additionally in most cases a mapping between AD "
 "and OTOBO groups will be necessary. This is configured by the following."
 msgstr ""
+"'otoboGroup' ist hier nur beispielhaft und muss durch das Attribut des "
+"Verzeichnisses ersetzt werden. Zusätzlich wird in den meisten Fällen eine "
+"Zuordnung zwischen AD-Gruppen und OTOBO Gruppen erforderlich sein. Dies wird "
+"wie folgt konfiguriert."
 
 #: ../content/index.rst:106
 msgid "Global"
@@ -156,17 +189,19 @@ msgstr "Global"
 
 #: ../content/index.rst:108
 msgid "Independently of the backend, it can also be restricted completely."
-msgstr ""
+msgstr "Unabhängig vom Backend kann es auch vollständig eingeschränkt werden."
 
 #: ../content/index.rst:122
 msgid "Frontend"
-msgstr ""
+msgstr "Frontend"
 
 #: ../content/index.rst:124
 msgid ""
 "In the customer and customer user administrations the groups can now be "
 "configured or seen for read only backends."
 msgstr ""
+"In den Kunden- und Kundenbenutzer-Verwaltungen können die Gruppen nun "
+"konfiguriert bzw. bei nur lesenden Backends eingesehen werden."
 
 #: ../content/index.rst:127
 msgid "Configuration Reference"
@@ -174,11 +209,11 @@ msgstr "Konfigurations-Referenz"
 
 #: ../content/index.rst:130
 msgid "Core::Permission"
-msgstr ""
+msgstr "Core::Permission"
 
 #: ../content/index.rst:133
 msgid "Multitenancy"
-msgstr ""
+msgstr "Multitenancy"
 
 #: ../content/index.rst:134
 msgid "Enables the multitenancy function for customer and customer user."
@@ -187,7 +222,7 @@ msgstr ""
 
 #: ../content/index.rst:137
 msgid "Multitenancy::PermissionGroup"
-msgstr ""
+msgstr "Multitenancy::PermissionGroup"
 
 #: ../content/index.rst:138
 msgid ""
